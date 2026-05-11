@@ -1,0 +1,168 @@
+/* ═══════════════════════════════════════════
+   PRODUCTS.CSS - Product Grid + Cards + Qty
+   ═══════════════════════════════════════════
+   
+   Purpose: Product listing grid layout, individual
+   product cards, quantity controls, wishlist button.
+   
+   Key Components:
+   - Product grid (2-column responsive)
+   - Product card (image, name, price, stock)
+   - Quantity stepper (+/- buttons + direct input)
+   - Wishlist heart icon
+   - Empty states
+   ═══════════════════════════════════════════ */
+
+/* === PRODUCT GRID === */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 8px var(--page-pad) calc(8px + 100px);
+}
+
+/* === PRODUCT CARD === */
+.product-card {
+  background: #fff;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s, box-shadow 0.2s;
+  animation: fadeIn 0.3s ease forwards;
+  position: relative;
+}
+
+.product-card:active { transform: scale(0.98); }
+
+.pc-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.pc-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+
+.pc-img-wrap:hover .pc-img { transform: scale(1.05); }
+
+/* Stock Badge */
+.pc-stock-badge {
+  position: absolute;
+  top: 6px; left: 6px;
+  padding: 3px 8px;
+  border-radius: var(--r-lg);
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 2;
+}
+
+.pc-stock-badge.in  { background: linear-gradient(135deg, #10b981, #059669); }
+.pc-stock-badge.low { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+/* Wishlist Button */
+.wish-btn {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 28px; height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.15s;
+}
+
+.wish-btn:active { background: #fff; }
+.wish-btn svg { width: 14px; height: 14px; stroke: var(--tmut); fill: none; stroke-width: 2; transition: stroke 0.15s, fill 0.15s; }
+.wish-btn.wished svg { stroke: #ef4444; fill: #ef4444; }
+
+/* Tag */
+.pc-tag {
+  position: absolute;
+  bottom: 6px; left: 6px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--g4), var(--ga));
+}
+
+/* Card Info */
+.pc-info { padding: 8px 10px 10px; }
+
+.pc-name-hindi { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-weight: 700; color: var(--g2); margin-bottom: 1px; }
+.pc-name { font-size: 11px; color: var(--tm); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.pc-price-row { display: flex; align-items: baseline; gap: 6px; }
+.pc-price { font-size: 15px; font-weight: 700; color: var(--g2); }
+.pc-mrp { font-size: 12px; color: var(--tmut); text-decoration: line-through; }
+
+/* === QUANTITY CONTROLS === */
+.qty-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.qty-btn {
+  width: 28px; height: 28px;
+  border: 1.5px solid var(--cream2);
+  border-radius: 50%;
+  background: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--g2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.qty-btn:hover { border-color: var(--g4); }
+.qty-btn:active { transform: scale(0.9); }
+
+.qty-input {
+  width: 32px;
+  border: none;
+  background: transparent;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--td);
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.pc-unit { font-size: 10px; color: var(--tmut); margin-left: auto; }
+
+/* === EMPTY STATES === */
+.no-products-state { text-align: center; padding: 50px 20px; color: var(--tmut); }
+.no-products-state svg { width: 48px; height: 48px; stroke: var(--cream2); fill: none; stroke-width: 1.5; margin-bottom: 12px; }
+.no-products-state h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--tm); }
+.no-products-state p { font-size: 12px; }
+
+/* === RESPONSIVE === */
+@media (min-width: 480px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+}
+@media (min-width: 768px) {
+  .products-grid { grid-template-columns: repeat(4, 1fr); padding: 12px 24px calc(12px + 100px); }
+}

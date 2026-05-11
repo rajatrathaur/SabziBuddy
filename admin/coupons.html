@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SabziBuddy — Coupon Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0F2318;--g2:#1C3829;--g3:#2D5A3F;--g4:#4A8B5C;--ga:#6BBF7B;
+  --cream:#F8F4EE;--cream2:#EDE7DC;--terra:#C8704A;
+  --td:#1A2E22;--tm:#3D5247;--tmut:#7A9186;
+  --r-sm:10px;--r-md:16px;--r-lg:24px;
+  --shadow-sm:0 2px 12px rgba(28,56,41,0.08);
+  --shadow-md:0 8px 32px rgba(28,56,41,0.14);
+  --shadow-lg:0 20px 60px rgba(28,56,41,0.22);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--td);min-height:100vh;}
+
+/* ═══ LOADING SCREEN ═══ */
+#auth-loading{
+  position:fixed;inset:0;background:var(--g1);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9999;gap:16px;
+}
+#auth-loading .spin{
+  width:36px;height:36px;border:3px solid rgba(107,191,123,0.3);
+  border-top-color:var(--ga);border-radius:50%;animation:spin .8s linear infinite;
+}
+#auth-loading p{color:rgba(255,255,255,0.6);font-size:13px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══ ADMIN LAYOUT ═══ */
+.admin-wrap{display:none;min-height:100vh;}
+.admin-header{
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 60%,var(--g3) 100%);
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 20px rgba(0,0,0,0.25);flex-wrap:wrap;gap:10px;
+}
+.admin-logo{display:flex;align-items:center;gap:10px;}
+.admin-logo-text{font-family:'Cormorant Garamond',serif;font-size:20px;color:#fff;font-weight:700;}
+.admin-logo-text span{color:var(--ga);}
+.admin-badge{
+  background:rgba(255,255,255,0.15);color:#fff;padding:3px 10px;
+  border-radius:50px;font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;border:1px solid rgba(255,255,255,0.25);
+}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.user-chip{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  border-radius:50px;padding:5px 12px;
+}
+.user-chip-av{
+  width:24px;height:24px;border-radius:50%;background:var(--ga);
+  color:var(--g1);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;flex-shrink:0;
+}
+.user-chip-name{font-size:12px;color:#fff;font-weight:600;max-width:120px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-chip-role{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+.role-owner{background:rgba(107,191,123,0.3);color:var(--ga);}
+.role-manager{background:rgba(251,191,36,0.3);color:#FCD34D;}
+.logout-btn{
+  background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);
+  color:#fff;padding:8px 18px;border-radius:50px;font-family:'Outfit',sans-serif;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;
+}
+.logout-btn:hover{background:rgba(255,255,255,0.22);}
+.back-btn{
+  background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.8);padding:8px 14px;border-radius:50px;
+  font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;
+  text-decoration:none;display:flex;align-items:center;gap:5px;transition:all 0.2s;
+}
+.back-btn:hover{background:rgba(255,255,255,0.16);color:#fff;}
+.admin-body{padding:20px;max-width:960px;margin:0 auto;}
+
+/* ═══ STATS ═══ */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:#fff;border-radius:var(--r-md);padding:18px 20px;box-shadow:var(--shadow-sm);border:1.5px solid var(--cream2);position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g4),var(--ga));}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--g2);line-height:1;}
+.stat-lbl{font-size:12px;color:var(--tmut);margin-top:4px;font-weight:500;}
+.stat-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:28px;opacity:0.18;}
+
+/* ═══ CARDS ═══ */
+.panel-card{background:#fff;border-radius:var(--r-lg);padding:28px;box-shadow:var(--shadow-sm);border:1.5px solid var(--cream2);margin-bottom:20px;}
+.panel-card h3{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--g2);margin-bottom:4px;}
+.panel-card .sub{font-size:13px;color:var(--tmut);margin-bottom:22px;line-height:1.5;}
+
+/* ═══ CREATE FORM ═══ */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:10px;font-weight:800;color:var(--tm);text-transform:uppercase;letter-spacing:1px;}
+.field input{
+  padding:12px 14px;border:1.5px solid var(--cream2);border-radius:var(--r-sm);
+  font-family:'Outfit',sans-serif;font-size:14px;color:var(--td);outline:none;
+  background:var(--cream);transition:all 0.2s;
+}
+.field input:focus{border-color:var(--g4);background:#fff;box-shadow:0 0 0 3px rgba(74,139,92,0.1);}
+.code-input{font-size:18px!important;font-weight:800!important;letter-spacing:3px!important;text-transform:uppercase;text-align:center;}
+.field-hint{font-size:10px;color:var(--tmut);margin-top:3px;}
+
+.preview-box{background:linear-gradient(135deg,var(--g2),var(--g3));border-radius:var(--r-md);padding:18px 20px;margin-top:16px;display:none;color:#fff;}
+.preview-box .pb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.7;margin-bottom:6px;}
+.preview-box .pb-code{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;letter-spacing:4px;}
+.preview-box .pb-details{font-size:12px;opacity:0.8;margin-top:4px;}
+
+.create-btn{
+  width:100%;margin-top:18px;padding:14px;background:var(--g2);color:#fff;
+  border:none;border-radius:var(--r-sm);font-family:'Outfit',sans-serif;
+  font-size:15px;font-weight:700;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;gap:8px;transition:all 0.25s;
+}
+.create-btn:hover:not(:disabled){background:var(--g3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,56,41,0.25);}
+.create-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+.form-msg{padding:12px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;margin-top:14px;display:none;}
+.form-msg.success{background:rgba(107,191,123,0.15);color:#1a5c24;border:1.5px solid rgba(107,191,123,0.4);}
+.form-msg.error{background:rgba(200,112,74,0.1);color:var(--terra);border:1.5px solid rgba(200,112,74,0.3);}
+
+/* ═══ LIST ═══ */
+.list-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.ftab{
+  background:var(--cream);border:1.5px solid var(--cream2);color:var(--tmut);
+  padding:6px 14px;border-radius:50px;font-family:'Outfit',sans-serif;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;
+}
+.ftab.active{background:var(--g2);border-color:var(--g2);color:#fff;}
+.ftab:hover:not(.active){border-color:var(--g4);color:var(--g2);}
+
+.coupon-row{
+  border:1.5px solid var(--cream2);border-radius:var(--r-md);padding:16px 18px;
+  display:flex;align-items:center;gap:14px;transition:all 0.2s;
+  margin-bottom:10px;background:#fff;
+}
+.coupon-row:hover{border-color:var(--g4);box-shadow:var(--shadow-sm);}
+.coupon-row.status-expired,.coupon-row.status-inactive,.coupon-row.status-full{background:#fafafa;opacity:0.75;}
+.coupon-row.status-active{border-left:4px solid var(--ga);}
+
+.ccode{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--g2);letter-spacing:2px;min-width:100px;flex-shrink:0;}
+.cinfo{flex:1;min-width:0;}
+.cdiscount{font-size:18px;font-weight:700;color:var(--g2);margin-bottom:4px;}
+.cmeta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+.mtag{background:var(--cream);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;color:var(--tm);}
+.mtag.warn{background:#fff7ed;color:#c2410c;}
+.mtag.ok{background:#f0fdf4;color:#166534;}
+.mtag.red{background:#fef2f2;color:#b91c1c;}
+
+.usage-bar-track{height:6px;background:var(--cream2);border-radius:50px;overflow:hidden;width:100%;max-width:180px;margin-top:4px;}
+.usage-bar-fill{height:100%;border-radius:50px;transition:width 0.5s ease;}
+
+.status-pill{padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap;}
+.sp-active{background:#dcfce7;color:#166534;}
+.sp-expired{background:#fee2e2;color:#991b1b;}
+.sp-inactive{background:#f1f5f9;color:#475569;}
+.sp-full{background:#fef3c7;color:#92400e;}
+
+.cactions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;}
+.abtn{border:none;border-radius:8px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.abtn:hover{transform:scale(1.05);}
+.abtn-deact{background:#fef3c7;color:#92400e;}
+.abtn-react{background:#dcfce7;color:#166534;}
+.abtn-delete{background:#fee2e2;color:#b91c1c;}
+.abtn-edit{background:rgba(74,139,92,0.12);color:var(--g2);}
+
+.empty-state{text-align:center;padding:48px 20px;color:var(--tmut);}
+.empty-icon{font-size:48px;margin-bottom:10px;}
+.empty-title{font-weight:600;font-size:15px;color:var(--tm);}
+.empty-sub{font-size:12px;margin-top:4px;}
+
+/* ═══ SPINNER ═══ */
+.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.35);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;flex-shrink:0;}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--td);color:#fff;padding:11px 24px;border-radius:50px;
+  font-size:13px;font-weight:500;z-index:9999;display:none;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:90vw;text-align:center;
+}
+.toast.success{background:var(--g2);}
+.toast.error{background:var(--terra);}
+
+/* ═══ EDIT MODAL ═══ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(28,56,41,0.55);z-index:200;
+  display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);
+}
+.modal-overlay.open{display:flex;}
+.modal-sheet{
+  background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:500px;
+  padding:28px 24px 32px;animation:slideUp 0.3s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-sheet h4{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--g2);margin-bottom:16px;}
+.modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.modal-field label{font-size:10px;font-weight:800;color:var(--tm);text-transform:uppercase;letter-spacing:1px;}
+.modal-field input{
+  padding:12px 14px;border:1.5px solid var(--cream2);border-radius:var(--r-sm);
+  font-family:'Outfit',sans-serif;font-size:14px;color:var(--td);outline:none;
+  background:var(--cream);transition:all 0.2s;
+}
+.modal-field input:focus{border-color:var(--g4);background:#fff;box-shadow:0 0 0 3px rgba(74,139,92,0.1);}
+.modal-actions{display:flex;gap:10px;margin-top:20px;}
+.modal-save{
+  flex:1;padding:13px;background:var(--g2);color:#fff;border:none;
+  border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:14px;
+  font-weight:700;cursor:pointer;transition:background 0.2s;
+}
+.modal-save:hover{background:var(--g3);}
+.modal-cancel{
+  padding:13px 20px;background:var(--cream);border:1.5px solid var(--cream2);
+  border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:14px;
+  cursor:pointer;color:var(--tm);
+}
+
+/* ═══ ACCESS DENIED ═══ */
+.access-denied{
+  position:fixed;inset:0;background:var(--g1);
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;text-align:center;padding:24px;
+}
+.access-denied.show{display:flex;}
+.access-denied h2{font-family:'Cormorant Garamond',serif;font-size:32px;color:#fff;}
+.access-denied p{font-size:14px;color:rgba(255,255,255,0.6);max-width:360px;line-height:1.6;}
+.access-denied a{
+  background:var(--g3);color:#fff;padding:11px 24px;border-radius:50px;
+  text-decoration:none;font-size:14px;font-weight:600;margin-top:8px;
+  display:inline-block;transition:background 0.2s;
+}
+.access-denied a:hover{background:var(--g4);}
+
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr 1fr;}
+  .coupon-row{flex-wrap:wrap;}
+  .ccode{min-width:auto;}
+  .cactions{width:100%;}
+  .abtn{flex:1;text-align:center;}
+  .admin-logo-text{font-size:16px;}
+}
+@media(max-width:400px){
+  .form-grid{grid-template-columns:1fr;}
+  .panel-card{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING SCREEN — auth check ke dauran dikhta hai ══ -->
+<div id="auth-loading">
+  <div class="spin"></div>
+  <p>Verifying access...</p>
+</div>
+
+<!-- ══ ACCESS DENIED — role allowed nahi hai ══ -->
+<div class="access-denied" id="access-denied">
+  <span style="font-size:56px">🚫</span>
+  <h2>Access Denied</h2>
+  <p>Coupon Manager sirf <strong style="color:var(--ga)">Owner</strong> aur <strong style="color:var(--ga)">Manager</strong> role ke liye available hai. Aapka account authorized nahi hai.</p>
+  <a href="admintest.html">← Admin Panel Pe Wapas Jao</a>
+</div>
+
+<!-- ══ ADMIN PANEL ══ -->
+<div class="admin-wrap" id="admin-wrap">
+  <header class="admin-header">
+    <div class="admin-logo">
+      <span style="font-size:22px">🥦</span>
+      <div>
+        <div class="admin-logo-text">Sabzi<span>Buddy</span></div>
+      </div>
+      <span class="admin-badge">Coupon Manager</span>
+    </div>
+    <div class="header-right">
+      <!-- ✅ FIX: User info display — kaun logged in hai + role badge -->
+      <div class="user-chip">
+        <div class="user-chip-av" id="user-av">?</div>
+        <span class="user-chip-name" id="user-name">Loading...</span>
+        <span class="user-chip-role" id="user-role-badge">—</span>
+      </div>
+      <a href="admintest.html" class="back-btn">← Admin Panel</a>
+      <button class="logout-btn" onclick="logout()">🔐 Logout</button>
+    </div>
+  </header>
+
+  <div class="admin-body">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="s-total">—</div><div class="stat-lbl">Total Coupons</div><div class="stat-icon">🎟️</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-active">—</div><div class="stat-lbl">Active Coupons</div><div class="stat-icon">✅</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-used">—</div><div class="stat-lbl">Total Uses</div><div class="stat-icon">👥</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-saved">—</div><div class="stat-lbl">Total Savings Given</div><div class="stat-icon">💰</div></div>
+    </div>
+
+    <!-- CREATE COUPON -->
+    <div class="panel-card">
+      <h3>➕ Naya Coupon Banao</h3>
+      <p class="sub">Coupon details bharo — expiry date ke baad automatically expire ho jaayega, chahe use hua ho ya nahi</p>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Coupon Code *</label>
+          <input class="code-input" type="text" id="c-code" placeholder="SABZI50" maxlength="20"
+            oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');updatePreview()">
+          <span class="field-hint">Only letters & numbers, no spaces</span>
+        </div>
+        <div class="field">
+          <label>Discount Amount (₹) *</label>
+          <input type="number" id="c-discount" placeholder="e.g. 50" min="1" max="9999" oninput="updatePreview()">
+          <span class="field-hint">Customer ko kitna discount milega</span>
+        </div>
+        <div class="field">
+          <label>Max Uses * <small style="font-size:9px;color:var(--tmut)">(kitne log use kar sakte)</small></label>
+          <input type="number" id="c-maxuses" placeholder="e.g. 100" min="1" max="999999" oninput="updatePreview()">
+          <span class="field-hint">1 se 999999 tak</span>
+        </div>
+        <div class="field">
+          <label>Expiry Date *</label>
+          <input type="date" id="c-expdate" oninput="updatePreview()">
+          <span class="field-hint">Is date ke baad expire ho jaayega</span>
+        </div>
+        <div class="field">
+  <label>Minimum Order Amount (₹)</label>
+  <input type="number" id="c-minorder" placeholder="e.g. 99" min="0" max="99999" oninput="updatePreview()">
+  <span class="field-hint">0 rakho toh koi limit nahi</span>
+</div>
+<div class="field">
+  <label>Category (Optional)</label>
+  <select id="c-category" onchange="updateCatSubcat();updatePreview()">
+    <option value="">All Categories</option>
+    <option value="veggie">🥦 Vegetables</option>
+    <option value="fruit">🍎 Fruits</option>
+    <option value="dairy">🥛 Dairy</option>
+    <option value="grocery">🛒 Grocery</option>
+    <option value="food">🍽️ Food & Drink</option>
+    <option value="electronics">🔌 Electronics</option>
+    <option value="new">✨ New Launches</option>
+  </select>
+  <span class="field-hint">Blank = saari categories pe kaam karega</span>
+</div>
+<div class="field" id="subcat-field" style="display:none">
+  <label>Subcategory (Optional)</label>
+  <select id="c-subcategory" onchange="updatePreview()">
+    <option value="">All Subcategories</option>
+  </select>
+</div>
+        <div class="field">
+          <label>Expiry Time *</label>
+          <input type="time" id="c-exptime" value="23:59" oninput="updatePreview()">
+          <span class="field-hint">Is samay ke baad koi use nahi kar sakta</span>
+        </div>
+      </div>
+
+      <div class="preview-box" id="preview-box">
+        <div class="pb-label">Coupon Preview</div>
+        <div class="pb-code" id="pb-code">—</div>
+        <div class="pb-details" id="pb-details">—</div>
+      </div>
+
+      <div class="form-msg" id="form-msg"></div>
+      <button class="create-btn" id="create-btn" onclick="createCoupon()">🎟️ Create Coupon</button>
+    </div>
+
+    <!-- COUPONS LIST -->
+    <div class="panel-card">
+      <div class="list-header">
+        <div>
+          <h3>📋 Saare Coupons</h3>
+        </div>
+        <div class="filter-tabs">
+          <button class="ftab active" onclick="setFilter('all',this)">All</button>
+          <button class="ftab" onclick="setFilter('active',this)">✅ Active</button>
+          <button class="ftab" onclick="setFilter('expired',this)">⏰ Expired</button>
+          <button class="ftab" onclick="setFilter('inactive',this)">🚫 Inactive</button>
+        </div>
+      </div>
+      <div id="coupon-list">
+        <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Loading coupons...</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <h4>✏️ Edit Coupon Expiry</h4>
+    <input type="hidden" id="edit-code">
+    <!-- ✅ FIX: modal-field class use karo, field class nahi — proper styling -->
+    <div class="modal-field">
+      <label>New Expiry Date</label>
+      <input type="date" id="edit-expdate">
+    </div>
+    <div class="modal-field">
+      <label>New Expiry Time</label>
+      <input type="time" id="edit-exptime" value="23:59">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="modal-save" onclick="saveEditCoupon()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyC0pR1bytYruzPhfP9vKRz99i1SMYkuCXE",
+  authDomain:"sabzibuddy-website.firebaseapp.com",
+  projectId:"sabzibuddy-website",
+  storageBucket:"sabzibuddy-website.firebasestorage.app",
+  messagingSenderId:"386650204024",
+  appId:"1:386650204024:web:d526329ffd463582c20a8d"
+});
+
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+// ✅ FIX: Persistence explicitly set karein — new tab mein auth state consistent rahe
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(e => console.warn('Persistence:', e));
+
+/* ════ STATE ════ */
+let allCoupons = [];
+let currentFilter = 'all';
+let unsubscribe = null;
+let toastT;
+
+/* ════════════════════════════════════════
+   ✅ FIX: Auth guard — PEHLE loading screen,
+   phir role check, phir panel ya access denied.
+   Sab kuch onAuthStateChanged ke andar hai.
+════════════════════════════════════════ */
+auth.onAuthStateChanged(async (user) => {
+
+  if (!user) {
+    // Not logged in → main admin login page pe bhejo
+    window.location.href = "admintest.html";
+    return;
+  }
+
+  try {
+    const doc = await db.collection("userRoles").doc(user.uid).get();
+
+    if (!doc.exists) {
+      showAccessDenied("Aapka role configure nahi hua. Admin se contact karein.");
+      return;
+    }
+
+    const data = doc.data();
+
+    // ✅ SECURITY: Sirf owner aur manager ko access
+    if (data.role !== "owner" && data.role !== "manager") {
+      showAccessDenied(`Aapka role "${data.role}" hai. Coupon manager ke liye owner ya manager role chahiye.`);
+      return;
+    }
+
+    // ✅ SUCCESS: User info dikhao aur panel show karo
+    showAdminPanel(user, data);
+
+  } catch (e) {
+    // Firestore error — deny access safely
+    showAccessDenied("Access verify karne mein error aaya: " + e.message);
+  }
+});
+
+function showAdminPanel(user, roleData) {
+  // Loading screen hatao
+  document.getElementById('auth-loading').style.display = 'none';
+
+  // User info header mein dikhao
+  const name = roleData.name || user.email || 'Admin';
+  const role = roleData.role;
+  const initials = name.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+  document.getElementById('user-av').textContent = initials;
+  document.getElementById('user-name').textContent = name;
+
+  const roleEl = document.getElementById('user-role-badge');
+  roleEl.textContent = role === 'owner' ? '👑 Owner' : '🧑‍💼 Manager';
+  roleEl.className = 'user-chip-role ' + (role === 'owner' ? 'role-owner' : 'role-manager');
+
+  // Panel dikhao
+  document.getElementById('admin-wrap').style.display = 'block';
+
+  // Initialize
+  setMinDate();
+  listenToCoupons();
+}
+
+function showAccessDenied(reason) {
+  document.getElementById('auth-loading').style.display = 'none';
+  const el = document.getElementById('access-denied');
+  el.classList.add('show');
+  // Optional reason paragraph update
+  if (reason) {
+    const p = el.querySelector('p');
+    if (p) p.textContent = reason;
+  }
+}
+
+/* ════ LOGOUT ════ */
+function logout() {
+  if (unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
+  }
+  auth.signOut().then(() => {
+    // ✅ FIX: Explicit redirect — onAuthStateChanged pe depend mat karo
+    window.location.href = "admintest.html";
+  }).catch(e => {
+    // Fallback — error hone pe bhi redirect karo
+    console.error('Logout error:', e);
+    window.location.href = "admintest.html";
+  });
+}
+
+/* ════ UTILS ════ */
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.style.display = 'block';
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.style.display = 'none', 3500);
+}
+
+function showFormMsg(type, msg) {
+  const el = document.getElementById('form-msg');
+  el.textContent = msg;
+  el.className = 'form-msg ' + type;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function setMinDate() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  // Create form
+  const expdate = document.getElementById('c-expdate');
+  expdate.min = todayStr;
+  if (!expdate.value) expdate.value = todayStr;
+  // ✅ FIX: Edit modal ka min date bhi update karo
+  document.getElementById('edit-expdate').min = todayStr;
+}
+
+function getStatus(c) {
+  const now = new Date();
+  const exp = c.expiresAt?.toDate ? c.expiresAt.toDate() : new Date(c.expiresAt);
+  if (!c.active) return 'inactive';
+  if (now > exp) return 'expired';
+  if ((c.usedCount || 0) >= c.maxUses) return 'full';
+  return 'active';
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+/* ════ PREVIEW ════ */
+function updatePreview() {
+  const code = document.getElementById('c-code').value.trim();
+  const discount = document.getElementById('c-discount').value;
+  const maxUses = document.getElementById('c-maxuses').value;
+  const expDate = document.getElementById('c-expdate').value;
+  const expTime = document.getElementById('c-exptime').value;
+  const box = document.getElementById('preview-box');
+
+  if (!code) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  document.getElementById('pb-code').textContent = code || '—';
+
+  const parts = [];
+  if (discount) parts.push(`₹${discount} discount`);
+  if (maxUses) parts.push(`${maxUses} uses max`);
+  if (expDate && expTime) {
+    const exp = new Date(`${expDate}T${expTime}`);
+    parts.push(`Expires: ${exp.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}`);
+  }
+  document.getElementById('pb-details').textContent = parts.join('  •  ') || 'Fill in details...';
+}
+
+const SUBCAT_OPTIONS = {
+  veggie: ['leafy','root','gourds','basics','exotic'],
+  fruit: ['citrus','tropical','berries','seasonal','dry'],
+  dairy: ['milk','paneer','curd','butter','icecream'],
+  grocery: ['atta','rice','oil','spices','sugar','noodles'],
+  food: ['snacks','beverages','sweets','bakery','instant'],
+  electronics: ['cables','bulbs','batteries','accessories','homeappliance'],
+  new: ['new']
+};
+
+function updateCatSubcat() {
+  const cat = document.getElementById('c-category').value;
+  const subcatField = document.getElementById('subcat-field');
+  const subcatSel = document.getElementById('c-subcategory');
+  if (!cat) { subcatField.style.display = 'none'; return; }
+  subcatField.style.display = 'flex';
+  const opts = SUBCAT_OPTIONS[cat] || [];
+  subcatSel.innerHTML = '<option value="">All Subcategories</option>' +
+    opts.map(s => `<option value="${s}">${s}</option>`).join('');
+}  
+
+async function createCoupon() {
+  const code = document.getElementById('c-code').value.trim().toUpperCase();
+  const discount = parseInt(document.getElementById('c-discount').value);
+  const maxUses = parseInt(document.getElementById('c-maxuses').value);
+  const expDate = document.getElementById('c-expdate').value;
+  const expTime = document.getElementById('c-exptime').value;
+  const minOrder = parseInt(document.getElementById('c-minorder').value) || 0;
+  const category = document.getElementById('c-category').value || '';
+  const subcategory = document.getElementById('c-subcategory').value || '';
+
+  if (!code) { showFormMsg('error', '❌ Coupon code enter karo!'); return; }
+  if (code.length < 3) { showFormMsg('error', '❌ Code kam se kam 3 characters ka hona chahiye!'); return; }
+  if (!discount || discount < 1) { showFormMsg('error', '❌ Discount amount enter karo (minimum ₹1)!'); return; }
+  if (!maxUses || maxUses < 1) { showFormMsg('error', '❌ Max uses enter karo (minimum 1)!'); return; }
+  if (!expDate || !expTime) { showFormMsg('error', '❌ Expiry date aur time dono required hain!'); return; }
+
+  const expiresAt = new Date(`${expDate}T${expTime}`);
+  if (expiresAt <= new Date()) { showFormMsg('error', '❌ Expiry time future mein hona chahiye!'); return; }
+
+  const btn = document.getElementById('create-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Creating...';
+
+  try {
+    const existing = await db.collection('coupons').doc(code).get();
+    if (existing.exists) {
+      showFormMsg('error', `❌ Code "${code}" pehle se exist karta hai! Dusra code use karo.`);
+      return;
+    }
+
+    const payload = {
+      code, discount, maxUses, usedCount: 0,
+      expiresAt: firebase.firestore.Timestamp.fromDate(expiresAt),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      active: true,
+      minOrder,
+      category,
+      subcategory
+    };
+
+    await db.collection('coupons').doc(code).set(payload);
+
+    let successMsg = `✅ Coupon "${code}" ban gaya! ₹${discount} off`;
+    if (minOrder > 0) successMsg += ` • Min ₹${minOrder}`;
+    if (category) successMsg += ` • ${category}${subcategory ? '/'+subcategory : ''}`;
+    successMsg += ` • ${maxUses} uses`;
+
+    showFormMsg('success', successMsg);
+    document.getElementById('c-code').value = '';
+    document.getElementById('c-discount').value = '';
+    document.getElementById('c-maxuses').value = '';
+    document.getElementById('c-minorder').value = '';
+    document.getElementById('c-category').value = '';
+    document.getElementById('c-subcategory').innerHTML = '<option value="">All Subcategories</option>';
+    document.getElementById('subcat-field').style.display = 'none';
+    document.getElementById('preview-box').style.display = 'none';
+    setMinDate();
+    document.getElementById('c-exptime').value = '23:59';
+    showToast(`✅ "${code}" coupon create ho gaya!`, 'success');
+
+  } catch (e) {
+    showFormMsg('error', '❌ Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🎟️ Create Coupon';
+  }
+}
+/* ════ LOAD & RENDER ════ */
+function listenToCoupons() {
+  if (unsubscribe) unsubscribe();
+
+  // ✅ FIX: orderBy ke saath fallback — agar index issue ho toh
+  // createdAt descending order, jo bhi doc bina createdAt ke hai wo bhi aayega
+  unsubscribe = db.collection('coupons')
+    .onSnapshot(snap => {
+      allCoupons = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // ✅ FIX: Client-side sort — Firestore index pe depend nahi
+      allCoupons.sort((a, b) => {
+        const ta = a.createdAt?.toDate?.() || new Date(0);
+        const tb = b.createdAt?.toDate?.() || new Date(0);
+        return tb - ta;
+      });
+      updateStats();
+      renderCoupons();
+    }, err => {
+      console.error('Coupon listener error:', err);
+      // ✅ FIX: Fallback — one-time fetch agar real-time listener fail ho
+      db.collection('coupons').get().then(snap => {
+        allCoupons = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        allCoupons.sort((a, b) => {
+          const ta = a.createdAt?.toDate?.() || new Date(0);
+          const tb = b.createdAt?.toDate?.() || new Date(0);
+          return tb - ta;
+        });
+        updateStats();
+        renderCoupons();
+        showToast('⚠️ Live updates nahi chal rahi. Data load ho gaya.', '');
+      }).catch(e2 => {
+        document.getElementById('coupon-list').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Error loading coupons</div>
+            <div class="empty-sub">${e2.message}</div>
+          </div>`;
+      });
+    });
+}
+
+function updateStats() {
+  let active = 0, used = 0, saved = 0;
+  allCoupons.forEach(c => {
+    if (getStatus(c) === 'active') active++;
+    used += c.usedCount || 0;
+    saved += (c.usedCount || 0) * (c.discount || 0);
+  });
+  document.getElementById('s-total').textContent = allCoupons.length;
+  document.getElementById('s-active').textContent = active;
+  document.getElementById('s-used').textContent = used;
+  document.getElementById('s-saved').textContent = '₹' + saved.toLocaleString('en-IN');
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderCoupons();
+}
+
+function renderCoupons() {
+  const list = document.getElementById('coupon-list');
+
+  let filtered = allCoupons.filter(c => {
+    const s = getStatus(c);
+    if (currentFilter === 'all') return true;
+    if (currentFilter === 'active') return s === 'active';
+    if (currentFilter === 'expired') return s === 'expired' || s === 'full';
+    if (currentFilter === 'inactive') return s === 'inactive';
+    return true;
+  });
+
+  if (!filtered.length) {
+    const msgs = {
+      all: 'Koi coupon nahi hai. Upar se create karo!',
+      active: 'Koi active coupon nahi.',
+      expired: 'Koi expired coupon nahi.',
+      inactive: 'Koi inactive coupon nahi.'
+    };
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎟️</div><div class="empty-title">${msgs[currentFilter]}</div></div>`;
+    return;
+  }
+
+  const statusLabel = { active: '✅ Active', expired: '⏰ Expired', inactive: '🚫 Inactive', full: '📦 Fully Used' };
+  const statusClass = { active: 'sp-active', expired: 'sp-expired', inactive: 'sp-inactive', full: 'sp-full' };
+  const rowClass = { active: 'status-active', expired: 'status-expired', inactive: 'status-inactive', full: 'status-expired' };
+
+  list.innerHTML = filtered.map(c => {
+    const status = getStatus(c);
+    const used = c.usedCount || 0;
+    const remaining = Math.max(0, c.maxUses - used);
+    const pct = Math.min(100, Math.round((used / c.maxUses) * 100));
+    const barColor = pct >= 90 ? '#ef4444' : pct >= 60 ? '#f59e0b' : '#4A8B5C';
+
+    return `<div class="coupon-row ${rowClass[status] || ''}">
+      <div class="ccode">${c.code}</div>
+      <div class="cinfo">
+        <div class="cdiscount">₹${c.discount} OFF</div>
+        <div class="cmeta">
+          <span class="mtag ${remaining <= 5 ? 'red' : remaining <= c.maxUses * 0.2 ? 'warn' : 'ok'}">🎟️ ${remaining} uses left</span>
+          <span class="mtag">👥 ${used}/${c.maxUses} used (${pct}%)</span>
+          <span class="mtag">⏰ ${fmtDate(c.expiresAt)}</span>
+          ${c.minOrder > 0 ? `<span class="mtag warn">🛒 Min ₹${c.minOrder}</span>` : ''}
+${c.category ? `<span class="mtag">📂 ${c.category}${c.subcategory ? '/'+c.subcategory : ''}</span>` : '<span class="mtag ok">🌐 All Categories</span>'}
+        </div>
+        <div class="usage-bar-track">
+          <div class="usage-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+      </div>
+      <span class="status-pill ${statusClass[status]}">${statusLabel[status]}</span>
+      <div class="cactions">
+        ${status === 'active' ? `<button class="abtn abtn-edit" onclick="openEditModal('${c.code}')">✏️ Edit</button>` : ''}
+        ${status === 'active' ? `<button class="abtn abtn-deact" onclick="deactivateCoupon('${c.code}')">🚫 Deactivate</button>` : ''}
+        ${status === 'inactive' ? `<button class="abtn abtn-react" onclick="reactivateCoupon('${c.code}')">✅ Reactivate</button>` : ''}
+        ${(status === 'expired' || status === 'full') ? `<button class="abtn abtn-edit" onclick="openEditModal('${c.code}')">🔄 Extend</button>` : ''}
+        <button class="abtn abtn-delete" onclick="deleteCoupon('${c.code}')">🗑️ Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════ ACTIONS ════ */
+async function deactivateCoupon(code) {
+  if (!confirm(`"${code}" coupon deactivate karein? Customers use nahi kar paayenge.`)) return;
+  try {
+    await db.collection('coupons').doc(code).update({ active: false });
+    showToast(`"${code}" deactivated.`, 'success');
+  } catch (e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function reactivateCoupon(code) {
+  const c = allCoupons.find(x => x.code === code);
+  if (!c) return;
+  const exp = c.expiresAt?.toDate ? c.expiresAt.toDate() : new Date(c.expiresAt);
+  if (new Date() > exp) {
+    showToast('⏰ Pehle expiry extend karo! Ye coupon expire ho chuka hai.', 'error');
+    openEditModal(code);
+    return;
+  }
+  try {
+    await db.collection('coupons').doc(code).update({ active: true });
+    showToast(`"${code}" reactivated! ✅`, 'success');
+  } catch (e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteCoupon(code) {
+  if (!confirm(`"${code}" coupon permanently delete karein? Yeh undo nahi ho sakta!`)) return;
+  try {
+    await db.collection('coupons').doc(code).delete();
+    showToast(`"${code}" deleted.`);
+  } catch (e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+/* ════ EDIT MODAL ════ */
+function openEditModal(code) {
+  const c = allCoupons.find(x => x.code === code);
+  if (!c) return;
+  document.getElementById('edit-code').value = code;
+  const exp = c.expiresAt?.toDate ? c.expiresAt.toDate() : new Date(c.expiresAt);
+  const yyyy = exp.getFullYear();
+  const mm = String(exp.getMonth() + 1).padStart(2, '0');
+  const dd = String(exp.getDate()).padStart(2, '0');
+  document.getElementById('edit-expdate').value = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('edit-exptime').value = `${String(exp.getHours()).padStart(2, '0')}:${String(exp.getMinutes()).padStart(2, '0')}`;
+  // ✅ FIX: Har baar modal open hone pe min date refresh karo
+  setMinDate();
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+async function saveEditCoupon() {
+  const code = document.getElementById('edit-code').value;
+  const expDate = document.getElementById('edit-expdate').value;
+  const expTime = document.getElementById('edit-exptime').value;
+  if (!expDate || !expTime) { showToast('Date aur time required hai!', 'error'); return; }
+  const expiresAt = new Date(`${expDate}T${expTime}`);
+  if (expiresAt <= new Date()) { showToast('Future date/time select karo!', 'error'); return; }
+  try {
+    await db.collection('coupons').doc(code).update({
+      expiresAt: firebase.firestore.Timestamp.fromDate(expiresAt),
+      active: true
+    });
+    closeEditModal();
+    showToast(`"${code}" updated & activated! ✅`, 'success');
+  } catch (e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// Close modal on overlay click
+document.getElementById('edit-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('edit-modal')) closeEditModal();
+});
+</script>
+</body>
+</html>
+

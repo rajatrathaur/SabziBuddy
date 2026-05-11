@@ -1,0 +1,25 @@
+/* ═══════════════════════════════════════════
+   ADMIN/admin-variables.css - Admin Design Tokens
+   ═══════════════════════════════════════════ */
+
+:root {
+  --admin-bg: #f3f4f6;
+  --admin-card: #ffffff;
+  --admin-text: #1f2937;
+  --admin-text-muted: #6b7280;
+  --admin-border: #e5e7eb;
+
+  --admin-green: #10b981;
+  --admin-green-dark: #059669;
+  --admin-red: #ef4444;
+  --admin-amber: #f59e0b;
+  --admin-blue: #3b82f6;
+  --admin-purple: #8b5cf6;
+
+  --admin-sidebar: #111827;
+  --admin-sidebar-w: 240px;
+  --admin-sidebar-collapsed: 64px;
+
+  --admin-radius: 8px;
+  --admin-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

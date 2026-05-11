@@ -1,0 +1,59 @@
+/* ═══════════════════════════════════════════
+   BASE.CSS - Reset + Body + Utilities
+   ═══════════════════════════════════════════
+   
+   Purpose: CSS reset, global typography, 
+   container styles, utility classes.
+   
+   Load Order: 2nd (after variables.css)
+   ═══════════════════════════════════════════ */
+
+/* === RESET === */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--cream);
+  color: var(--td);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent pull-to-refresh on mobile */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* === UTILITY CLASSES === */
+.hidden { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.text-center { text-align: center; }
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.w-full { width: 100%; }
+
+/* === SCROLLBAR STYLING === */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--cream2); }
+::-webkit-scrollbar-thumb { background: var(--g4); border-radius: 4px; }
+
+/* === SELECTION COLOR === */
+::selection {
+  background: rgba(107, 191, 123, 0.3);
+  color: var(--g2);
+}

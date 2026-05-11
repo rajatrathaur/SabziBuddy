@@ -1,0 +1,189 @@
+/* ═══════════════════════════════════════════
+   ORDER.CSS - Checkout Form + Delivery Slots
+   ═══════════════════════════════════════════
+   
+   Purpose: Order placement page, form fields,
+   delivery slot grid, free delivery bar.
+   ═══════════════════════════════════════════ */
+
+#order-page {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--cream);
+  overflow-y: auto;
+}
+
+.op-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--cream2);
+  position: sticky;
+  top: 0;
+  background: var(--cream);
+  z-index: 5;
+}
+
+.op-body { padding: 16px; padding-bottom: 120px; }
+
+/* === FORM FIELDS === */
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--g2);
+  margin-bottom: 6px;
+}
+
+.form-group label .required { color: var(--red); }
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--cream2);
+  border-radius: var(--r-lg);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--td);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--g4);
+  box-shadow: 0 0 0 3px rgba(74, 139, 92, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: var(--tmut); }
+
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+/* Phone input with +91 prefix */
+.phone-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--cream2);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.phone-input-wrap:focus-within {
+  border-color: var(--g4);
+  box-shadow: 0 0 0 3px rgba(74, 139, 92, 0.1);
+}
+
+.phone-prefix {
+  padding: 12px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tm);
+  border-right: 1.5px solid var(--cream2);
+  background: var(--cream2);
+  flex-shrink: 0;
+}
+
+.phone-input-wrap input {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  flex: 1;
+}
+
+/* === MAP PICKER TRIGGER === */
+.map-trigger-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px dashed var(--cream2);
+  border-radius: var(--r-lg);
+  background: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--tm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s;
+}
+
+.map-trigger-btn:hover { border-color: var(--g4); }
+.map-trigger-btn svg { width: 18px; height: 18px; stroke: var(--g4); flex-shrink: 0; }
+
+/* === DELIVERY SLOTS === */
+.slots-section { margin-top: 20px; }
+
+.slots-section h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--g2);
+  margin-bottom: 10px;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.slot-btn {
+  padding: 12px;
+  border: 1.5px solid var(--cream2);
+  border-radius: var(--r-md);
+  background: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tm);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.slot-btn:hover { border-color: var(--g4); }
+
+.slot-btn.selected {
+  border-color: var(--g4);
+  background: rgba(74, 139, 92, 0.08);
+  color: var(--g2);
+  font-weight: 600;
+}
+
+.slot-btn .slot-date { font-size: 11px; color: var(--tmut); margin-top: 2px; }
+
+/* === ORDER FOOTER === */
+.op-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid var(--cream2);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+.place-order-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--g2), var(--g4));
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.place-order-btn:hover { box-shadow: 0 4px 16px rgba(28, 56, 41, 0.25); }
+.place-order-btn:active { transform: scale(0.98); }

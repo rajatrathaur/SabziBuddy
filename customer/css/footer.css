@@ -1,0 +1,80 @@
+/* ═══════════════════════════════════════════
+   FOOTER.CSS - Footer + Social Buttons
+   ═══════════════════════════════════════════
+   
+   Purpose: Page footer with social media links,
+   copyright, and additional info.
+   ═══════════════════════════════════════════ */
+
+.footer {
+  padding: 24px var(--page-pad) calc(24px + env(safe-area-inset-bottom));
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  color: #fff;
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.footer-tagline {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+
+/* === SOCIAL BUTTONS === */
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.footer-social a {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.15s;
+  text-decoration: none;
+}
+
+.footer-social a:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+.footer-social a svg {
+  width: 18px; height: 18px;
+  fill: #fff;
+}
+
+/* === FOOTER LINKS === */
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover { color: #fff; }
+
+/* === COPYRIGHT === */
+.footer-copy {
+  font-size: 11px;
+  opacity: 0.5;
+}

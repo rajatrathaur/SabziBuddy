@@ -1,0 +1,55 @@
+/* ═══════════════════════════════════════════
+   VARIABLES.CSS - CSS Custom Properties
+   ═══════════════════════════════════════════
+
+   Purpose: Global design tokens - colors, shadows, 
+   border-radius values used across all CSS files.
+   
+   Load Order: 1st (before any other CSS file)
+   
+   Change here affects entire app.
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* === BRAND COLORS (Green Theme) === */
+  --g1: #0F2318;        /* Darkest green - deep backgrounds */
+  --g2: #1C3829;        /* Dark green - headers, primary elements */
+  --g3: #2D5A3F;        /* Medium green - hover states */
+  --g4: #4A8B5C;        /* Primary green - buttons, accents */
+  --ga: #6BBF7B;        /* Light green - highlights, success */
+  
+  /* === NEUTRAL COLORS === */
+  --cream: #F8F4EE;     /* Main background */
+  --cream2: #EDE7DC;    /* Secondary background, borders */
+  --terra: #C8704A;     /* Accent orange - prices, CTAs */
+  
+  /* === TEXT COLORS === */
+  --td: #1A2E22;        /* Text dark - headings */
+  --tm: #3D5247;        /* Text medium - body text */
+  --tmut: #7A9186;      /* Text muted - captions, placeholders */
+  
+  /* === STATUS COLORS === */
+  --red: #DC2626;       /* Error, OOS, danger */
+  --amber: #D97706;     /* Warning, pending */
+  --blue: #2563EB;      /* Info, links */
+  --purple: #7C3AED;    /* Special highlights */
+  
+  /* === SHADOWS === */
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 32px rgba(28, 56, 41, 0.14);
+  --shadow-lg: 0 20px 60px rgba(28, 56, 41, 0.22);
+  
+  /* === BORDER RADIUS === */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  
+  /* === SPACING === */
+  --page-pad: 16px;
+  --section-gap: 14px;
+}
+
+/* === DARK MODE (Future - placeholder) === */
+@media (prefers-color-scheme: dark) {
+  /* Future dark mode variables */
+}
