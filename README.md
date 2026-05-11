@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SabziBuddy
 
 > Taazi Sabzi, Farm se Ghar Tak
@@ -42,3 +43,6 @@ v1.0.0 - Initial Release
 ---
 
 Copyright 2026 SabziBuddy. All rights reserved.
+=======
+# SabziBuddy
+>>>>>>> 7c7d011b9946f34881f77062707aaba25a99fd88
